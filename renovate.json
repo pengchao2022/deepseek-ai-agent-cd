@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json.schemastore.org/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "recreateWhen": "always",
+  "enabledManagers": ["regex", "helmv3"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "\\.gotmpl$",
+        "helm\\.gotmpl$"
+      ],
+      "matchStrings": [
+        "repository:\\s*[\"']?(?<depName>[^\\s\"']+)[\"']?\\s+tag:\\s*[\"']?(?<currentValue>[^\\s\"']+)[\"']?"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "labels": ["dependencies", "renovate", "cd-pipeline"]
+    }
+  ]
+}
