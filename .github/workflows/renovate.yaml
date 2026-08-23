@@ -23,11 +23,11 @@ jobs:
           fetch-depth: 0
 
       - name: Run Renovate
-        uses: renovatebot/github-action@v40.0.0
+        uses: renovatebot/github-action@v41.0.0  
         with:
-          token: ${{ secrets.GITOPS_PAT }}  # 使用具备 repo 权限的个人访问令牌
           configurationFile: renovate.json
         env:
+          RENOVATE_TOKEN: ${{ secrets.GITOPS_PAT }}  # 必须通过环境变量 RENOVATE_TOKEN 传入
           RENOVATE_AUTODISCOVER: 'true'
           RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
           LOG_LEVEL: "debug"
