@@ -1,0 +1,33 @@
+name: Run Renovate
+
+on:
+  repository_dispatch:
+    types: [run-renovate]  # 专门用来接收上游应用 CI 发过来的触发信号
+  schedule:
+    - cron: '0 */6 * * *'  # 每 6 小时自动定时检查一次
+  workflow_dispatch:        # 支持在 GitHub 网页端手动点按钮触发
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      statuses: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@v40.0.0
+        with:
+          token: ${{ secrets.GITOPS_PAT }}  # 使用具备 repo 权限的个人访问令牌
+          configurationFile: renovate.json
+        env:
+          RENOVATE_AUTODISCOVER: 'true'
+          RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
+          LOG_LEVEL: "debug"
