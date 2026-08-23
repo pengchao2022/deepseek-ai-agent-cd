@@ -1,0 +1,113 @@
+{{- /* define base static variables */ -}}
+{{- $env := "production" -}}
+{{- if .Values.global }}
+  {{- $env = .Values.global.environment | default "production" -}}
+{{- end -}}
+
+{{- /* Bypass type checking restrictions for Helmfile structs and Maps */ -}}
+{{- $chartName := "deepseek-agent" -}}
+{{- if printf "%T" . | printf "%s" | contains "Release" }}
+  {{- if .Chart }}{{ $chartName = .Chart.Name }}{{ end }}
+{{- end -}}
+
+{{- $releaseName := "deepseek-agent" -}}
+{{- if .Release }}
+  {{- $releaseName = .Release.Name | default "deepseek-agent" -}}
+{{- end -}}
+
+{{- $fullname := printf "%s-%s" $releaseName $chartName -}}
+
+# application and image config
+global:
+  environment: {{ $env }}
+
+image:
+  repository: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent"
+  tag: "0.0.1"
+  pullPolicy: IfNotPresent
+
+# prod / staging / dev environment differentiation
+{{- if eq $env "production" }}
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+
+ingress:
+  enabled: true
+  className: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/target-type: "ip"
+  hosts:
+    - host: agent.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+{{- else if eq $env "staging" }}
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+
+ingress:
+  enabled: true
+  className: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: "internal"
+    alb.ingress.kubernetes.io/target-type: "ip"
+  hosts:
+    - host: agent-staging.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+{{- else }} {{- /* development */ -}}
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+resources:
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+
+ingress:
+  enabled: true
+  className: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: "internal"
+    alb.ingress.kubernetes.io/target-type: "ip"
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+{{- end }}
