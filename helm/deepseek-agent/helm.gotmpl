@@ -28,7 +28,7 @@ image:
 
 # prod / staging / dev environment differentiation
 {{- if eq $env "production" }}
-replicaCount: 1
+replicaCount: 3
 
 service:
   type: ClusterIP
@@ -50,7 +50,7 @@ ingress:
     alb.ingress.kubernetes.io/scheme: "internet-facing"
     alb.ingress.kubernetes.io/target-type: "ip"
   hosts:
-    - host: agent.example.com
+    - host: agent.awsmpc.asia
       paths:
         - path: /
           pathType: Prefix
@@ -78,7 +78,7 @@ ingress:
     alb.ingress.kubernetes.io/scheme: "internal"
     alb.ingress.kubernetes.io/target-type: "ip"
   hosts:
-    - host: agent-staging.example.com
+    - host: agent-staging.awsmpc.asia
       paths:
         - path: /
           pathType: Prefix
@@ -106,7 +106,7 @@ ingress:
     alb.ingress.kubernetes.io/scheme: "internal"
     alb.ingress.kubernetes.io/target-type: "ip"
   hosts:
-    - host: ""
+    - host: agent-dev.awsmpc.asia
       paths:
         - path: /
           pathType: Prefix
