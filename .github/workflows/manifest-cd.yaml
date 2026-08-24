@@ -43,8 +43,6 @@ jobs:
           helmfile --version
 
       - name: Generate Manifests via Helmfile
-        env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }} 
         run: |
           mkdir -p manifests
           helmfile template --file helm/deepseek-agent/helmfile.yaml > manifests/deepseek-agent-spec.yaml

@@ -1,0 +1,12 @@
+# install external secrets
+
+# 1. 添加 External Secrets Helm 仓库
+helm repo add external-secrets https://charts.external-secrets.io
+helm repo update
+
+# 2. 安装 Operator 到 external-secrets 命名空间
+helm install external-secrets external-secrets/external-secrets \
+  --namespace external-secrets \
+  --create-namespace
+
+  

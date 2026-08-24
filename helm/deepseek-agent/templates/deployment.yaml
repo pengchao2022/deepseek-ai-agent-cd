@@ -26,7 +26,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: deepseek-secret
-              key: api-key
+              key: DEEPSEEK_API_KEY   
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         livenessProbe:
