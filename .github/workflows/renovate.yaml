@@ -29,10 +29,18 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      # ✅ 直接 docker login 到 ECR
+      # ✅ 获取 ECR 密码（用于传递给 Renovate）
+      - name: Get ECR Password
+        id: ecr
+        run: |
+          PASSWORD=$(aws ecr get-login-password --region us-east-1)
+          echo "ecr_password=$PASSWORD" >> $GITHUB_OUTPUT
+          echo "✅ ECR password retrieved"
+
+      # ✅ 同时 docker login（用于宿主机 Docker 命令）
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region us-east-1 | \
+          echo "${{ steps.ecr.outputs.ecr_password }}" | \
             docker login --username AWS --password-stdin 317429619308.dkr.ecr.us-east-1.amazonaws.com
           echo "✅ Docker logged into ECR successfully"
 
@@ -40,6 +48,9 @@ jobs:
         uses: renovatebot/github-action@v41.0.0
         with:
           configurationFile: renovate.json
+          # ✅ 使用 extraEnv 传递 hostRules
+          extraEnv: |
+            RENOVATE_HOST_RULES=[{"hostType":"docker","matchHost":"317429619308.dkr.ecr.us-east-1.amazonaws.com","username":"AWS","password":"${{ steps.ecr.outputs.ecr_password }}"}]
         env:
           RENOVATE_TOKEN: ${{ secrets.GITOPS_PAT }}
           RENOVATE_AUTODISCOVER: 'true'
