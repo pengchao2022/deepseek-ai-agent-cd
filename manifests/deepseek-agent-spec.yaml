@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.36"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.37"
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
@@ -143,5 +143,4 @@ spec:
         jwt:
           serviceAccountRef:
             name: external-secrets-sa
-            namespace: external-secrets
 
