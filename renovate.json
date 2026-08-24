@@ -24,6 +24,11 @@
     {
       "matchUpdateTypes": ["major", "minor", "patch"],
       "labels": ["dependencies", "renovate", "cd-pipeline"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent"],
+      "versioning": "semver"
     }
   ]
 }
