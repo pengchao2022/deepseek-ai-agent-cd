@@ -3,7 +3,5 @@ releases:
     namespace: default
     chart: .
     values:
+      - environment: production
       - helm.gotmpl
-
-      - global:
-          environment: production
