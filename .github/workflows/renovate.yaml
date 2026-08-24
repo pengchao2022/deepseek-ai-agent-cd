@@ -26,8 +26,8 @@ jobs:
         uses: renovatebot/github-action@v41.0.0  
         with:
           configurationFile: renovate.json
-          token: ${{ secrets.GITOPS_PAT }}  # 必须作为 with 的参数传入，Action 才会正确挂载给底层容器
         env:
+          RENOVATE_TOKEN: ${{ secrets.GITOPS_PAT }}
           RENOVATE_AUTODISCOVER: 'true'
           RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
           LOG_LEVEL: "debug"
