@@ -2,17 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: deepseek-agent
-  namespace: argocd   # ArgoCD 自身所在的命名空间（根据你的实际情况修改，通常是 argocd）
+  namespace: argocd  
   finalizers:
     - resources-finalizer.argocd.argoproj.io # 级联删除：当删除该 App 时，自动清理 Kubernetes 集群中纳管的资源
 spec:
   project: default
 
-  # 1. 源码仓库配置（指向你的 Helm Chart 存放的 Git 仓库）
   source:
     repoURL: https://github.com/pengchao2022/deepseek-ai-agent-cd.git
-    targetRevision: HEAD # 或指定分支，如 main / master
-    path: charts/deepseek-agent  # 你 Helm Chart 在仓库中的相对路径
+    targetRevision: HEAD 
+    path: manifests
 
     # 2. 传递环境参数（对应你 helm.gotmpl 中的环境判断，支持 production / staging / development）
     helm:
@@ -20,12 +19,10 @@ spec:
         global:
           environment: production  # 这里可按需改为 staging 或 development
 
-  # 3. 目标集群与命名空间配置
   destination:
-    server: 'https://kubernetes.default.svc' # 默认纳管当前 ArgoCD 所在的集群
-    namespace: deepseek-agent-prod             # 目标部署的 Namespace（建议按环境区分，如 deepseek-agent-dev）
+    server: 'https://kubernetes.default.svc' 
+    namespace: deepseek-agent-prod             
 
-  # 4. 同步策略配置（建议开启自动同步和自动创建命名空间）
   syncPolicy:
     automated:
       prune: true     # 自动清理在 Git 中已被删除的资源
