@@ -1,10 +1,9 @@
 ---
 # Source: deepseek-agent/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  name: deepseek-agent-role
-  namespace: ai-agent
+  name: deepseek-agent-cluster-role
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -12,16 +11,24 @@ metadata:
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 rules:
+  # 允许获取当前命名空间或集群的 Pod 和 Service
   - apiGroups: [""]
     resources: ["pods", "services"]
+    verbs: ["get", "list"]
+  # 允许获取集群节点（Nodes）信息（属于集群级别资源）
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list"]
+  # 允许获取 metrics-server 提供的集群节点与 Pod 内存/CPU 监控指标
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["nodes", "pods"]
     verbs: ["get", "list"]
 ---
 # Source: deepseek-agent/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: deepseek-agent-rolebinding
-  namespace: ai-agent
+  name: deepseek-agent-cluster-rolebinding
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -30,11 +37,11 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 subjects:
   - kind: ServiceAccount
-    name: default  
-    namespace: ai-agent
+    name: default
+    namespace: ai-agent  # 绑定到 ai-agent 命名空间下的 default SA
 roleRef:
-  kind: Role
-  name: deepseek-agent-role
+  kind: ClusterRole
+  name: deepseek-agent-cluster-role
   apiGroup: rbac.authorization.k8s.io
 ---
 # Source: deepseek-agent/templates/service.yaml
@@ -86,7 +93,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.47"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.49"
         imagePullPolicy: IfNotPresent
         command: ["uvicorn"]
         args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
