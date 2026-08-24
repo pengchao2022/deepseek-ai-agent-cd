@@ -1,0 +1,6 @@
+releases:
+  - name: deepseek-agent
+    namespace: default
+    chart: .
+    values:
+      - helm.gotmpl
