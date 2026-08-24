@@ -2,19 +2,20 @@ name: Run Renovate
 
 on:
   repository_dispatch:
-    types: [run-renovate]  # 专门用来接收上游应用 CI 发过来的触发信号
+    types: [run-renovate]
   schedule:
-    - cron: '0 */6 * * *'  # 每 6 小时自动定时检查一次
-  workflow_dispatch:        # 支持在 GitHub 网页端手动点按钮触发
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: read
+  id-token: write  # ⚠️ 需要添加这个，用于 OIDC
 
 jobs:
   renovate:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-      pull-requests: write
-      statuses: read
 
     steps:
       - name: Checkout
@@ -22,8 +23,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      # 1. 配置 AWS 凭证（使用 OIDC）
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # 2. 登录 ECR 并获取密码
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: private
+
+      # 3. 运行 Renovate
       - name: Run Renovate
-        uses: renovatebot/github-action@v41.0.0  
+        uses: renovatebot/github-action@v41.0.0
         with:
           configurationFile: renovate.json
         env:
@@ -31,3 +47,13 @@ jobs:
           RENOVATE_AUTODISCOVER: 'true'
           RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
           LOG_LEVEL: "debug"
+          # ⚠️ 关键：将 ECR 凭证传递给 Renovate
+          RENOVATE_HOST_RULES: |
+            [
+              {
+                "hostType": "docker",
+                "matchHost": "317429619308.dkr.ecr.us-east-1.amazonaws.com",
+                "username": "AWS",
+                "password": "${{ steps.ecr-login.outputs.docker-password }}"
+              }
+            ]
