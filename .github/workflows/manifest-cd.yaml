@@ -28,16 +28,10 @@ jobs:
         with:
           version: 'v3.14.0'
 
-      - name: Hardcode Install Helmfile & Helm Diff
+      - name: Install Helmfile & Helm Diff Plugin
         run: |
-          echo "1. Manually downloading and linking helm-diff plugin..."
-          HELM_PLUGIN_DIR=$(helm env HELM_PLUGINS)
-          mkdir -p "$HELM_PLUGIN_DIR/helm-diff"
-          
-          DIFF_VERSION=$(curl -s "https://api.github.com/repos/databus23/helm-diff/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
-          curl -Lo helm-diff.tgz "https://github.com/databus23/helm-diff/releases/download/v${DIFF_VERSION}/helm-diff-linux-amd64.tgz"
-          tar -zxf helm-diff.tgz -C "$HELM_PLUGIN_DIR/helm-diff"
-          
+          echo "1. Installing helm-diff plugin..."
+          helm plugin install https://github.com/databus23/helm-diff || true
           helm plugin list
 
           echo "2. Installing Helmfile CLI..."
