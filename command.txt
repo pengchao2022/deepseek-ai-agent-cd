@@ -9,4 +9,7 @@ helm install external-secrets external-secrets/external-secrets \
   --namespace external-secrets \
   --create-namespace
 
-  
+
+# delete app in argocd
+
+kubectl patch application deepseek-agent -n argocd --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
