@@ -4,3 +4,6 @@ releases:
     chart: .
     values:
       - helm.gotmpl
+
+      - global:
+          environment: production
