@@ -4,7 +4,7 @@ metadata:
   name: deepseek-agent
   namespace: argocd  
   finalizers:
-    - resources-finalizer.argocd.argoproj.io # 级联删除：当删除该 App 时，自动清理 Kubernetes 集群中纳管的资源
+    - argocd.argoproj.io/resources-finalizer
 spec:
   project: default
 
@@ -13,11 +13,10 @@ spec:
     targetRevision: HEAD 
     path: manifests
 
-    # 2. 传递环境参数（对应你 helm.gotmpl 中的环境判断，支持 production / staging / development）
     helm:
       values: |
         global:
-          environment: production  # 这里可按需改为 staging 或 development
+          environment: production
 
   destination:
     server: 'https://kubernetes.default.svc' 
@@ -25,7 +24,7 @@ spec:
 
   syncPolicy:
     automated:
-      prune: true     # 自动清理在 Git 中已被删除的资源
-      selfHeal: true  # 自动纠偏：如果有人在集群里手动改坏了配置，ArgoCD 会自动拉回 Git 的状态
+      prune: true     
+      selfHeal: true 
     syncOptions:
-      - CreateNamespace=true  # 如果目标 Namespace 不存在，自动帮你创建
+      - CreateNamespace=true  
