@@ -1,4 +1,20 @@
 ---
+# Source: deepseek-agent/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: deepseek-secret
+  namespace: default
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+stringData:
+  DEEPSEEK_API_KEY:
+---
 # Source: deepseek-agent/templates/service.yaml
 apiVersion: v1
 kind: Service
@@ -48,7 +64,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.28"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.30"
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
