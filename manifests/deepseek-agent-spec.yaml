@@ -1,20 +1,4 @@
 ---
-# Source: deepseek-agent/templates/secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: deepseek-secret
-  namespace: default
-  labels:
-    helm.sh/chart: deepseek-agent-0.1.0
-    app.kubernetes.io/name: deepseek-agent
-    app.kubernetes.io/instance: deepseek-agent
-    app.kubernetes.io/version: "0.0.1"
-    app.kubernetes.io/managed-by: Helm
-type: Opaque
-stringData:
-  DEEPSEEK_API_KEY:
----
 # Source: deepseek-agent/templates/service.yaml
 apiVersion: v1
 kind: Service
@@ -64,7 +48,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.34"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.35"
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
@@ -73,7 +57,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: deepseek-secret
-              key: api-key
+              key: DEEPSEEK_API_KEY   
         resources:
           limits:
             cpu: 500m
@@ -123,4 +107,41 @@ spec:
                 name: deepseek-agent
                 port:
                   number: 80
+---
+# Source: deepseek-agent/templates/externalsecret.yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: deepseek-external-secret
+  namespace: default
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: aws-secretsmanager
+    kind: SecretStore
+  target:
+    name: deepseek-secret
+    creationPolicy: Owner
+  data:
+    - secretKey: DEEPSEEK_API_KEY
+      remoteRef:
+        key: prod/deepseek/api-key
+        property: DEEPSEEK_API_KEY
+---
+# Source: deepseek-agent/templates/secretstore.yaml
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: aws-secretsmanager
+  namespace: default
+spec:
+  provider:
+    aws:
+      service: SecretsManager
+      region: us-east-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: external-secrets-sa
+            namespace: external-secrets
 
