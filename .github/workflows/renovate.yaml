@@ -46,5 +46,4 @@ jobs:
           RENOVATE_AUTODISCOVER: 'true'
           RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
           LOG_LEVEL: "debug"
-          # ✅ 核心修复：直接将输出的密码拼进 HOST_RULES 环境变量中
           RENOVATE_HOST_RULES: '[{"hostType": "docker", "matchHost": "317429619308.dkr.ecr.us-east-1.amazonaws.com", "username": "AWS", "password": "${{ steps.ecr.outputs.ecr_password }}"}]'
