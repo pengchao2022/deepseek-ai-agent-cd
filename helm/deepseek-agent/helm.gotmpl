@@ -1,6 +1,6 @@
 {{- /* define base static variables */ -}}
 {{- $env := "production" -}}
-{{- if .Values.global }}
+{{- if and .Values (hasKey .Values "global") .Values.global -}}
   {{- $env = .Values.global.environment | default "production" -}}
 {{- end -}}
 
