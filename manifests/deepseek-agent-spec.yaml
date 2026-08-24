@@ -1,0 +1,110 @@
+---
+# Source: deepseek-agent/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: deepseek-agent
+  namespace: default
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+---
+# Source: deepseek-agent/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deepseek-agent
+  namespace: default
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: deepseek-agent
+      app.kubernetes.io/instance: deepseek-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: deepseek-agent
+        app.kubernetes.io/instance: deepseek-agent
+    spec:
+      containers:
+      - name: agent
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.22"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DEEPSEEK_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: deepseek-secret
+              key: api-key
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+# Source: deepseek-agent/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: deepseek-agent
+  namespace: default
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    -
+      host: "agent.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: deepseek-agent
+                port:
+                  number: 80
+
