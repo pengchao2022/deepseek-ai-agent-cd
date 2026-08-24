@@ -30,7 +30,7 @@
       "matchPackageNames": ["317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent"],
       "versioning": "semver",
       "separateMajorMinor": false,
-      "allowedVersions": "/^v\\d+\\.\\d+\\.\\d+/"
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+/"
     }
   ]
 }
