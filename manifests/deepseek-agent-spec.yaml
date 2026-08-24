@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.37"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.38"
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
@@ -130,17 +130,18 @@ spec:
 ---
 # Source: deepseek-agent/templates/secretstore.yaml
 apiVersion: external-secrets.io/v1
-kind: SecretStore
+Kind: SecretStore
 metadata:
-  name: aws-secretsmanager
-  namespace: default
+  Name: aws-secretsmanager
+  Namespace: default
 spec:
-  provider:
-    aws:
-      service: SecretsManager
-      region: us-east-1
-      auth:
-        jwt:
-          serviceAccountRef:
-            name: external-secrets-sa
+  Provider:
+    Aws:
+      Auth:
+        Jwt:
+          Service Account Ref:
+            Name: external-secrets-sa
+            Namespace: external-secrets 
+      Region: us-east-1
+      Service: SecretsManager
 
