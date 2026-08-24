@@ -1,4 +1,42 @@
 ---
+# Source: deepseek-agent/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deepseek-agent-role
+  namespace: ai-agent
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services"]
+    verbs: ["get", "list"]
+---
+# Source: deepseek-agent/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: deepseek-agent-rolebinding
+  namespace: ai-agent
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+subjects:
+  - kind: ServiceAccount
+    name: default  
+    namespace: ai-agent
+roleRef:
+  kind: Role
+  name: deepseek-agent-role
+  apiGroup: rbac.authorization.k8s.io
+---
 # Source: deepseek-agent/templates/service.yaml
 apiVersion: v1
 kind: Service
@@ -48,7 +86,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.45"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.47"
         imagePullPolicy: IfNotPresent
         command: ["uvicorn"]
         args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
