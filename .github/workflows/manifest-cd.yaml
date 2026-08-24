@@ -28,10 +28,11 @@ jobs:
         with:
           version: 'v3.14.0'
 
-      - name: Install Helmfile & Helm Diff Plugin
+      - name: Install Helmfile & Compatible Helm Diff Plugin
         run: |
-          echo "1. Installing helm-diff plugin..."
-          helm plugin install https://github.com/databus23/helm-diff || true
+          echo "1. Installing compatible helm-diff plugin..."
+          # 指定安装兼容旧版 Helm 的 v3.12.5 版本
+          helm plugin install https://github.com/databus23/helm-diff --version v3.12.5
           helm plugin list
 
           echo "2. Installing Helmfile CLI..."
