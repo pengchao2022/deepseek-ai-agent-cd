@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: deepseek-agent
-  namespace: default
+  namespace: ai-agent
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -27,7 +27,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deepseek-agent
-  namespace: default
+  namespace: ai-agent
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.44"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.45"
         imagePullPolicy: IfNotPresent
         command: ["uvicorn"]
         args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
@@ -85,7 +85,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: deepseek-agent
-  namespace: default
+  namespace: ai-agent
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -132,7 +132,7 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: deepseek-external-secret
-  namespace: default
+  namespace: ai-agent
 spec:
   refreshInterval: "2h"
   secretStoreRef:
