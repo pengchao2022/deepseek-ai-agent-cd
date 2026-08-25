@@ -11,9 +11,9 @@ metadata:
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 rules:
-  # 允许获取当前命名空间或集群的 Pod 和 Service
+  # 允许获取集群的 Pod、Pod 日志 (pods/log) 和 Service
   - apiGroups: [""]
-    resources: ["pods", "services"]
+    resources: ["pods", "pods/log", "services"]
     verbs: ["get", "list"]
   # 允许获取集群节点（Nodes）信息（属于集群级别资源）
   - apiGroups: [""]
@@ -93,7 +93,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.49"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.52"
         imagePullPolicy: IfNotPresent
         command: ["uvicorn"]
         args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
