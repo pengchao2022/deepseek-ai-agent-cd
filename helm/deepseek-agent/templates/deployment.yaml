@@ -31,15 +31,28 @@ spec:
               key: DEEPSEEK_API_KEY   
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+        
+        # 1. 启动探针
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+          failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+
+        # 2. 存活探针
         livenessProbe:
           httpGet:
             path: /healthz
             port: {{ .Values.service.targetPort }}
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+
+        # 3. 就绪探针
         readinessProbe:
           httpGet:
             path: /healthz
             port: {{ .Values.service.targetPort }}
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds }}

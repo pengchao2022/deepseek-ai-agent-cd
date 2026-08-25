@@ -26,6 +26,18 @@ image:
   tag: "3.1.54"
   pullPolicy: IfNotPresent
 
+probes:
+  startup:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 20
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
 # prod / staging / dev environment differentiation
 {{- if eq $env "production" }}
 replicaCount: 3

@@ -13,3 +13,13 @@ helm install external-secrets external-secrets/external-secrets \
 # delete app in argocd
 
 kubectl patch application deepseek-agent -n argocd --type=json -p='[{"op": "remove", "path": "/metadata/finalizers"}]'
+
+
+# 1. 切换到你的功能分支
+git checkout feature/GTP-54273-deepseek-cd-new
+
+# 2. 拉取远端最新代码
+git fetch origin
+
+# 3. 将远端的 main 分支合并到你的当前分支
+git merge origin/main
