@@ -5,9 +5,9 @@ metadata:
   labels:
     {{- include "deepseek-agent.labels" . | nindent 4 }}
 rules:
-  # 允许获取当前命名空间或集群的 Pod 和 Service
+  # 允许获取集群的 Pod、Pod 日志 (pods/log) 和 Service
   - apiGroups: [""]
-    resources: ["pods", "services"]
+    resources: ["pods", "pods/log", "services"]
     verbs: ["get", "list"]
   # 允许获取集群节点（Nodes）信息（属于集群级别资源）
   - apiGroups: [""]
