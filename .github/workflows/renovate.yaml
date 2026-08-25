@@ -33,7 +33,6 @@ jobs:
         id: ecr
         run: |
           PASSWORD=$(aws ecr get-login-password --region us-east-1)
-          # 使用 echo "::add-mask::$PASSWORD" 保护密码不被打印到日志里
           echo "::add-mask::$PASSWORD"
           echo "ecr_password=$PASSWORD" >> $GITHUB_OUTPUT
 
