@@ -1,10 +1,55 @@
 ---
+# Source: deepseek-agent/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deepseek-agent-cluster-role
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+rules:
+  # 允许获取当前命名空间或集群的 Pod 和 Service
+  - apiGroups: [""]
+    resources: ["pods", "services"]
+    verbs: ["get", "list"]
+  # 允许获取集群节点（Nodes）信息（属于集群级别资源）
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list"]
+  # 允许获取 metrics-server 提供的集群节点与 Pod 内存/CPU 监控指标
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list"]
+---
+# Source: deepseek-agent/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: deepseek-agent-cluster-rolebinding
+  labels:
+    helm.sh/chart: deepseek-agent-0.1.0
+    app.kubernetes.io/name: deepseek-agent
+    app.kubernetes.io/instance: deepseek-agent
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: ai-agent  # 绑定到 ai-agent 命名空间下的 default SA
+roleRef:
+  kind: ClusterRole
+  name: deepseek-agent-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+---
 # Source: deepseek-agent/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: deepseek-agent
-  namespace: default
+  namespace: ai-agent
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -27,7 +72,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deepseek-agent
-  namespace: default
+  namespace: ai-agent
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -35,7 +80,7 @@ metadata:
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: deepseek-agent
@@ -48,8 +93,10 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.26"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.49"
         imagePullPolicy: IfNotPresent
+        command: ["uvicorn"]
+        args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
         ports:
         - containerPort: 8000
         env:
@@ -57,7 +104,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: deepseek-secret
-              key: api-key
+              key: DEEPSEEK_API_KEY   
         resources:
           limits:
             cpu: 500m
@@ -83,7 +130,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: deepseek-agent
-  namespace: default
+  namespace: ai-agent
   labels:
     helm.sh/chart: deepseek-agent-0.1.0
     app.kubernetes.io/name: deepseek-agent
@@ -97,7 +144,7 @@ spec:
   ingressClassName: alb
   rules:
     -
-      host: "agent.example.com"
+      host: "agent.awsmpc.asia"
       http:
         paths:
           - path: /
@@ -107,4 +154,41 @@ spec:
                 name: deepseek-agent
                 port:
                   number: 80
+---
+# Source: deepseek-agent/templates/secretstore.yaml
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: aws-secretsmanager
+
+spec:
+  provider:
+    aws:
+      service: SecretsManager
+      region: us-east-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: external-secrets-sa
+            namespace: external-secrets
+---
+# Source: deepseek-agent/templates/externalsecret.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: deepseek-external-secret
+  namespace: ai-agent
+spec:
+  refreshInterval: "2h"
+  secretStoreRef:
+    name: aws-secretsmanager
+    kind: ClusterSecretStore  
+  target:
+    name: deepseek-secret
+    creationPolicy: Owner
+  data:
+    - secretKey: DEEPSEEK_API_KEY
+      remoteRef:
+        key: prod/deepseek/api-key
+        property: DEEPSEEK_API_KEY
 
