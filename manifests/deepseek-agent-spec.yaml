@@ -80,7 +80,7 @@ metadata:
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: 3
+  replicas: 5
   selector:
     matchLabels:
       app.kubernetes.io/name: deepseek-agent
@@ -93,7 +93,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.50"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.55"
         imagePullPolicy: IfNotPresent
         command: ["uvicorn"]
         args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
