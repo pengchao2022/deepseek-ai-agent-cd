@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: deepseek-project
+  namespace: argocd
+spec:
+  description: "AI Agent applications project"
+  sourceRepos:
+    - "https://github.com/pengchao2022/*"  # 限制该项目只允许从这个 GitHub 组织/仓库拉取代码（安全控制）
+  destinations:
+    - namespace: "ai-agent"       # 限制该项目只能部署到匹配该前缀的命名空间
+      server: "https://kubernetes.default.svc"
+      
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

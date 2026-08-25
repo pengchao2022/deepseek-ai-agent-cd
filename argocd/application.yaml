@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - argocd.argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: deepseek-project
 
   source:
     repoURL: https://github.com/pengchao2022/deepseek-ai-agent-cd.git
@@ -15,7 +15,7 @@ spec:
 
   destination:
     server: 'https://kubernetes.default.svc' 
-    namespace: deepseek-agent-prod             
+    namespace: ai-agent            
 
   syncPolicy:
     automated:
