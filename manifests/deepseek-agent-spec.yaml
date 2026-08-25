@@ -93,7 +93,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.54"
+        image: "317429619308.dkr.ecr.us-east-1.amazonaws.com/deepseek-ai-agent:3.1.55"
         imagePullPolicy: IfNotPresent
         command: ["uvicorn"]
         args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
@@ -112,12 +112,25 @@ spec:
           requests:
             cpu: 100m
             memory: 256Mi
-        livenessProbe:
+        
+        # 1. 启动探针
+        startupProbe:
           httpGet:
             path: /healthz
             port: 8000
           initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 20
+
+        # 2. 存活探针
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 10
           periodSeconds: 10
+
+        # 3. 就绪探针
         readinessProbe:
           httpGet:
             path: /healthz
