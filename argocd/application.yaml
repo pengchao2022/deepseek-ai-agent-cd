@@ -3,6 +3,9 @@ kind: Application
 metadata:
   name: deepseek-agent
   namespace: argocd  
+  labels:                
+    env: production
+    team: ai-engineering
   finalizers:
     - argocd.argoproj.io/resources-finalizer
 spec:

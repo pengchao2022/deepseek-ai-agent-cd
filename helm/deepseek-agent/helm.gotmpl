@@ -40,7 +40,7 @@ probes:
 
 # prod / staging / dev environment differentiation
 {{- if eq $env "production" }}
-replicaCount: 3
+replicaCount: 5
 
 service:
   type: ClusterIP
