@@ -1,7 +1,17 @@
 # deepseek-ai-agent-cd
 In this demo I will deploy deepseek ai agent to EKS, I also write the tools in ai agent and you can ask questions by call the deepseek API 
 
+## AI agent running On EKS
 
+```shell
+kubectl get pods -n ai-agent 
+NAME                              READY   STATUS    RESTARTS   AGE
+deepseek-agent-5647c677dd-8pmpk   1/1     Running   0          9d
+deepseek-agent-5647c677dd-fcrss   1/1     Running   0          9d
+deepseek-agent-5647c677dd-fjh7q   1/1     Running   0          9d
+deepseek-agent-5647c677dd-t8dsp   1/1     Running   0          9d
+deepseek-agent-5647c677dd-xjb7g   1/1     Running   0          9d
+```
 ## Usage
 
 Ask questions:
